@@ -4,7 +4,7 @@ class WhenbotController < ApplicationController
   def callback
     
     response = Task.handle_callback(params[:channel], params[:trigger], params, request.headers, request.body.read)
-    response = validate_response(response)
+    response = parse_response(response)
     
     if response[:head_only]
       head response[:status]
@@ -17,9 +17,9 @@ class WhenbotController < ApplicationController
 
   private
   
-  def validate_response(response)
+  def parse_response(response)
     response ||= {}
-    response[:head_only]  ||= response[:body] ? false : true
+    response[:head_only]  ||= response[:body].blank?
     response[:status]     ||= :ok
     response[:type]       ||= :json
     response[:headers]    ||= ''
